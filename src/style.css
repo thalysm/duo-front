@@ -1,0 +1,19 @@
+:root{
+  --color-primary: #EC095A;
+  --color-secondary: #9747FF;
+  --color-highlight: #252831;
+  --color-background: #161922;
+  --color-gray: #3A3E4B;
+  --color-results: #1D212B;
+}
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+
+}
+body{
+  background-color: var(--color-background);
+  min-height: 100dvh;
+}
