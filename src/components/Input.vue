@@ -1,4 +1,17 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const emits = defineEmits<{
+  (e: "update:modelValue", value: string): void;
+}>();
+
+const props = withDefaults(
+  defineProps<{
+    modelValue: string;
+  }>(), {
+    modelValue: "",
+  }
+);
+
+</script>
 <template>
   <div class="input-container">
     <svg
@@ -19,7 +32,10 @@
     <input
       type="text"
       class="input"
-      placeholder="Pesquisar títulos">
+      placeholder="Pesquisar títulos"
+      @input="(e) => emits('update:modelValue', (e.target! as any).value)"
+      >
+      
 
   </div>
 </template>
