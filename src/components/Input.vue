@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { onMounted, useTemplateRef } from 'vue';
+
 const emits = defineEmits<{
   (e: "update:modelValue", value: string): void;
 }>();
@@ -10,6 +12,15 @@ const props = withDefaults(
     modelValue: "",
   }
 );
+
+const input = useTemplateRef<HTMLInputElement | null>('input');
+
+onMounted(() => {;
+  if (input.value) {
+    input.value.focus();
+  }
+});
+
 
 </script>
 <template>
@@ -33,6 +44,8 @@ const props = withDefaults(
       type="text"
       class="input"
       placeholder="Pesquisar títulos"
+      :value="props.modelValue"
+      ref="input"
       @input="(e) => emits('update:modelValue', (e.target! as any).value)"
       >
       
