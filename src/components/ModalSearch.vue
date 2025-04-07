@@ -11,6 +11,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{
   "update:modelValue": [value: boolean];
+  "setMovie": [id: number, title: string, image: string | null];
 }>();
 const internalValue = ref(false);
 
@@ -18,6 +19,12 @@ watch(
   () => props.modelValue,
   (value) => {
     internalValue.value = value;
+    if (value) {
+      moviesList.value = []; // Limpa a lista ao abrir o modal
+      search.value = ""; // Limpa o campo de busca ao abrir o modal
+      clearTimeout(timeout!);
+      loading.value = false; // Reseta o estado de carregamento ao abrir o modal
+    }
   },
   {
     immediate: true,
@@ -51,6 +58,7 @@ const loading = ref(false);
 
 const getMovies = async (name: string) => {
   try {
+    moviesList.value = []; // Limpa a lista antes de buscar novos resultados
     loading.value = true;
     const response = await getMovieByName(name);
     console.log(response.data);
@@ -62,18 +70,25 @@ const getMovies = async (name: string) => {
   }
 };
 
+const selectMovie = (movie:IMovie) => {
+  emit("setMovie", movie.id, movie.title, movie.poster_path || null);
+
+};
+
 </script>
 
 <template>
   <Modal v-model="internalValue" @onClose="internalValue = false">
-    <Input v-model="search"> </Input>
+    <Input v-model="search"
+    v-if="internalValue"
+    > </Input>
     <div v-if="loading" class="loading-indicator">Carregando...</div>
     <div v-if="!loading && moviesList.length === 0" class="no-results">Digite para procurar</div>
     <div class="cards-results-search">
       <div class="card-result" v-for="movie in moviesList" :key="movie.id">
         <CardResult
           hiddenButton
-          @click=""
+          @click="selectMovie(movie)"
           :image="`https://image.tmdb.org/t/p/w600_and_h900_bestv2/${movie.poster_path}`"
         />
         <p class="movie-title">{{movie.title}}</p>
