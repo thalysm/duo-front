@@ -94,8 +94,8 @@ const recommendations = ref<IMovie[]>([]);
 
 const generateRecommendation = async () => {
   const payload = {
-    user1_movies: Object.values(listOne.value).map((item) => item.title),
-    user2_movies: Object.values(listTwo.value).map((item) => item.title),
+    user1_movies: Object.values(listOne.value).map((item) => item.id),
+    user2_movies: Object.values(listTwo.value).map((item) => item.id),
   };
 
   try {
