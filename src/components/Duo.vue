@@ -3,15 +3,17 @@ import Card from "./Card.vue";
 import Button from "./Button.vue";
 import CardResult from "./CardResult.vue";
 import ModalSearch from "./ModalSearch.vue";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import ModalFeedback from "./ModalFeedback.vue";
 import { generateMovies } from "../services/movies";
 import type { IMovie } from "../model/movie";
+import { TYPE_TOAST, useToast } from "b-toast";
 
 const showModal = ref(false);
 const showRate = ref(false);
 const selectedCard = ref<number | null>(null);
 const selectedList = ref<0 | 1>(0);
+const toast = useToast();
 
 const listOne = ref<Record<number,any>>({
   0:{
@@ -90,7 +92,16 @@ const setSelectedCard = ( id:number, title: string ,image: string | null) => {
     localStorage.setItem("listTwo", JSON.stringify(listTwo.value));
   }
 };
+
 const recommendations = ref<IMovie[]>([]);
+const recommendation = ref<{id: number, similarity: number}>({id:-1, similarity: -1});
+
+const setSelectedCardRecommendation = (id: number, similarity: number) => {
+  showRate.value = true;
+  recommendation.value.id = id;
+  recommendation.value.similarity = similarity;
+};
+
 
 const generateRecommendation = async () => {
   const payload = {
@@ -103,7 +114,12 @@ const generateRecommendation = async () => {
     recommendations.value = response.data.recommendations;
   } catch (error) {
     console.error("Error generating recommendation:", error);
-  }}
+    toast.show("Erro ao gerar recomendação. Tente novamente mais tarde.", {
+      type: TYPE_TOAST.ERROR,
+    });
+  }
+
+}
 
   onMounted(() => {
     const storedListOne = localStorage.getItem("listOne");
@@ -176,12 +192,15 @@ const generateRecommendation = async () => {
     localStorage.removeItem("listTwo");
   };
 
+  const listId = computed(() => {
+    return [...Object.values(listOne.value), ...Object.values(listTwo.value)].map((item) => item.id);
+  });
 
 </script>
 
 <template>
   <ModalSearch v-model="showModal" @setMovie="setSelectedCard" />
-  <ModalFeedback v-model="showRate" />
+  <ModalFeedback v-model="showRate" :movie-recommendation="recommendation" :listId="listId" />
   <div class="background">
     <div class="menu">
       <h1 class="title">D<span class="title-complete">uo</span></h1>
@@ -216,7 +235,7 @@ const generateRecommendation = async () => {
       </Button>
     </div>
     <div class="cards-results">
-      <CardResult v-for="recomend in recommendations"  @rate="showRate=true" :image="`https://image.tmdb.org/t/p/w600_and_h900_bestv2/${recomend.poster_path}`"/>
+      <CardResult v-for="recomend in recommendations"  @rate="setSelectedCardRecommendation(recomend.id,recomend.similarity)" :image="`https://image.tmdb.org/t/p/w600_and_h900_bestv2/${recomend.poster_path}`"/>
       
 
     </div>
@@ -266,6 +285,7 @@ const generateRecommendation = async () => {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   gap: 20px;
+  
 }
 .action-button {
   display: flex;
@@ -273,4 +293,50 @@ const generateRecommendation = async () => {
   margin-top: 20px;
   gap: 20px;
 }
+@media (max-width: 768px) {
+  .cards, .cards-results {
+    grid-template-columns: 1fr 1fr;
+    place-items: center;
+  }
+  .card:nth-child(1){
+    order: 0;    
+  }
+  .card:nth-child(2){
+    order: 4;    
+  }
+  .card:nth-child(3){
+    order: 2;    
+  }
+  .card:nth-child(4){
+    order: 3;    
+  }
+  .card:nth-child(5){
+    order: 1;    
+  }
+  .card:nth-child(6){
+    order: 8;    
+  }
+  .card:nth-child(7){
+    order: 6;    
+  }
+  .card:nth-child(8){
+    order: 7;    
+  }
+  .card:nth-child(9){
+    order: 5;    
+  }
+  .card:nth-child(10){
+    order: 9;    
+  }
+  .title-list{
+    justify-content: space-around;
+  }
+  .cards-results .card:last-child {
+    display: none;
+  }
+  .title {
+    padding-left: 10px;
+  }
+}
+
 </style>

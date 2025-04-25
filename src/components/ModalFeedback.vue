@@ -3,14 +3,22 @@ import { ref, watch } from "vue";
 import Modal from "./Modal.vue";
 import Button from "./Button.vue";
 import Rating from "./Rating.vue";
+import type { IRating } from "../model/rating";
+import { sendRating } from "../services/ratings";
+import { TYPE_TOAST, useToast } from "b-toast";
+
+const toast = useToast();
 
 const props = defineProps<{
   modelValue: boolean;
+  movieRecommendation: {id: number, similarity: number};
+  listId: number[];
 }>();
 const emit = defineEmits<{
   "update:modelValue": [value: boolean];
 }>();
 const internalValue = ref(false);
+const rating = ref<number | null>(null);
 
 watch(
   () => props.modelValue,
@@ -27,6 +35,40 @@ watch(
     emit("update:modelValue", value);
   }
 );
+
+const closeModal = () => {
+  rating.value = null;
+  internalValue.value = false;
+};
+
+
+const createRating = async () => {
+  if (rating.value === null) {
+    return;
+  }
+  const payload: IRating = {
+    rating: rating.value,
+    movie_id: props.movieRecommendation.id,
+    movies_associated: props.listId,
+    similarity: props.movieRecommendation.similarity,
+  };
+
+  
+
+  try {
+    await sendRating(payload);
+    closeModal();
+    toast.show("Avaliação enviada com sucesso!");
+  } catch (error) {
+    console.error("Error sending rating:", error);
+    toast.show("Erro ao enviar avaliação. Tente novamente mais tarde.", {
+      type: TYPE_TOAST.ERROR,
+    });
+  }
+
+  internalValue.value = false;
+};
+
 </script>
 <template>
   <Modal v-model="internalValue" @onClose="internalValue = false">
@@ -35,11 +77,11 @@ watch(
       <h3>Avalie essa recomendação</h3>
       <p>Nos ajude a melhorar o sistema de recomendação, contribua com sua avalição.</p>
       <div v-if="internalValue">
-        <Rating></Rating>
+        <Rating v-model="rating"></Rating>
       </div>
       <div class="buttons">
-        <Button type="tertiary">Cancelar</Button>
-        <Button>Avaliar</Button>
+        <Button @click="closeModal" type="tertiary">Cancelar</Button>
+        <Button @click="createRating">Avaliar</Button>
       </div>
     </div>
   </Modal>
@@ -70,5 +112,18 @@ p {
   display: flex;
   gap: 10px;
   margin-top: 40px;
+}
+@media screen and (max-width: 768px) {
+  .modal-feedback {
+    max-width: 100%;
+    padding: 10px;
+    height: 100%;
+  }
+  h3 {
+    font-size: 20px;
+  }
+  p {
+    font-size: 12px;
+  }
 }
 </style>

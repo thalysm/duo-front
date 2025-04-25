@@ -49,6 +49,7 @@ watch(
     justify-content: center;
     align-items: center;
     gap: 5px;
+    
 }
 label {
     font-size: 20px;
@@ -68,11 +69,19 @@ input[type="radio"] {
     border: 1px solid var(--color-background);
     border-radius: 8px;
     cursor: pointer;
+    
 }
 .rating:hover {
     border: 1px solid var(--color-primary);
 }
 .rating.checked {
     background-color: var(--color-primary);
+}
+@media screen and (max-width: 768px) {
+
+    .rating-container {
+        flex-wrap: wrap;
+    }
+    
 }
 </style>
