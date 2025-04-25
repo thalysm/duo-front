@@ -10,5 +10,5 @@ export const generateMovies = async (data: {
     "user1_movies": string[],
     "user2_movies": string[]
   }):Promise<AxiosResponse<{recommendations:IMovie[]}>> => {
-    return await http.post(`/recommendations/recommend/`, data)
+    return await http.post(`/recommendations/recommend`, data)
 }
