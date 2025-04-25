@@ -62,7 +62,7 @@ const getMovies = async (name: string) => {
     loading.value = true;
     const response = await getMovieByName(name);
     console.log(response.data);
-    moviesList.value = response.data.slice(0, 12); // Limitar a 10 resultados
+    moviesList.value = response.data.slice(0, 12); // Limitar a 12 resultados
   } catch (error) {
     console.error("Error fetching movies:", error);
   } finally {
@@ -75,13 +75,27 @@ const selectMovie = (movie:IMovie) => {
 
 };
 
+const closeModal = () => {
+  internalValue.value = false;
+  search.value = ""; // Limpa o campo de busca ao fechar o modal
+  moviesList.value = []; // Limpa a lista ao fechar o modal
+  clearTimeout(timeout!); // Limpa o timeout para evitar chamadas desnecessárias
+};
+
 </script>
 
 <template>
   <Modal v-model="internalValue" @onClose="internalValue = false">
-    <Input v-model="search"
-    v-if="internalValue"
-    > </Input>
+    <div class="header">
+
+      <Input v-model="search"
+      v-if="internalValue"
+      > </Input>
+      <svg @click="closeModal" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+</svg>
+
+    </div>
     <div v-if="loading" class="loading-indicator">Carregando...</div>
     <div v-if="!loading && moviesList.length === 0" class="no-results">Digite para procurar</div>
     <div class="cards-results-search">
@@ -137,4 +151,33 @@ const selectMovie = (movie:IMovie) => {
   width: 860px;
   height: 310px;
 }
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  width: 100%;
+  gap: 10px;
+}
+.header svg {
+  cursor: pointer;
+  color: var(--color-primary);
+  width: 24px;
+  height: 24px;
+}
+@media screen and (max-width: 768px) {
+  .cards-results-search {
+    max-width: 100%;
+    max-height: 100%;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .movie-title {
+    font-size: 14px;
+  }
+  .no-results, .loading-indicator {
+    width: 100%;
+    height: auto;
+  }
+  }
 </style>

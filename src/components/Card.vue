@@ -51,4 +51,11 @@ const emits = defineEmits<{
 .card-secondary {
   border: 1px solid var(--color-secondary);
 }
+@media screen and (max-width: 768px) {
+  .card {
+    width: 160px;
+    height: 200px;
+  }
+  
+}
 </style>

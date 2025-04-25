@@ -5,6 +5,7 @@ defineProps<{
   image?: string;
   hiddenButton?: boolean;
   onClick?: () => void;
+  listId?: any[];
 }>();
 const emits = defineEmits<{
   (e: "click"): void;
@@ -50,5 +51,11 @@ transition: opacity 0.3s ease, visibility 0.3s ease;
 .cursor-pointer {
   cursor: pointer;
 }
-
+@media screen and (max-width: 768px) {
+  .card {
+    width: 160px;
+    height: 200px;
+  }
+  
+}
 </style>
